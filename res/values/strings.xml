@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Expenses test</string>
+    <string name="app_name">Expenses evidence</string>
     <string name="no_notes">No Records Yet</string>
     <string name="menu_insert">Add Expense</string>
     <string name="menu_delete">Delete Expense</string>
     <string name="title">Title</string>
     <string name="body">Body</string>
+    <string name="amount">Amount</string>
     <string name="confirm">Confirm</string>
     <string name="edit_note">Edit Expense</string>
 </resources>

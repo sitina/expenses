@@ -1,5 +1,8 @@
 package net.sitina.android.expenses;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +15,8 @@ public class ExpensesDbAdapter {
     public static final String KEY_TITLE = "title";
     public static final String KEY_BODY = "body";
     public static final String KEY_ROWID = "_id";
+    public static final String KEY_AMOUNT = "amount";
+    public static final String KEY_CREATED = "created";
 
     private static final String TAG = "NotesDbAdapter";
     private DatabaseHelper mDbHelper;
@@ -21,12 +26,12 @@ public class ExpensesDbAdapter {
      * Database creation sql statement
      */
     private static final String DATABASE_CREATE =
-            "create table notes (_id integer primary key autoincrement, "
-                    + "title text not null, body text not null);";
+            "create table expenses (_id integer primary key autoincrement, "
+                    + "title text not null, body text not null, amount number not null, created text not null);";
 
     private static final String DATABASE_NAME = "data";
-    private static final String DATABASE_TABLE = "notes";
-    private static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_TABLE = "expenses";
+    private static final int DATABASE_VERSION = 1;
 
     private final Context mCtx;
 
@@ -38,7 +43,6 @@ public class ExpensesDbAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-
             db.execSQL(DATABASE_CREATE);
         }
 
@@ -47,6 +51,7 @@ public class ExpensesDbAdapter {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS notes");
+            db.execSQL("DROP TABLE IF EXISTS expenses");
             onCreate(db);
         }
     }
@@ -90,10 +95,18 @@ public class ExpensesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String body) {
+    public long createExpense(String title, String body, Double amount, Date created) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
+        initialValues.put(KEY_AMOUNT, amount);
+        
+        // set the format to sql date time
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+        if (created == null) {
+        	created = new Date();
+        }
+        initialValues.put(KEY_CREATED, dateFormat.format(created));
 
         return mDb.insert(DATABASE_TABLE, null, initialValues);
     }
@@ -104,20 +117,25 @@ public class ExpensesDbAdapter {
      * @param rowId id of note to delete
      * @return true if deleted, false otherwise
      */
-    public boolean deleteNote(long rowId) {
+    public boolean deleteExpense(long rowId) {
 
         return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
     }
 
+    public boolean deleteAll() {
+        return mDb.delete(DATABASE_TABLE, null, null) > 0;
+    }
+
+    
     /**
      * Return a Cursor over the list of all notes in the database
      * 
      * @return Cursor over all notes
      */
-    public Cursor fetchAllNotes() {
+    public Cursor fetchAllExpenses() {
 
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE,
-                KEY_BODY}, null, null, null, null, null);
+                KEY_BODY, KEY_AMOUNT, KEY_CREATED}, null, null, null, null, null);
     }
 
     /**
@@ -127,12 +145,11 @@ public class ExpensesDbAdapter {
      * @return Cursor positioned to matching note, if found
      * @throws SQLException if note could not be found/retrieved
      */
-    public Cursor fetchNote(long rowId) throws SQLException {
+    public Cursor fetchExpense(long rowId) throws SQLException {
 
         Cursor mCursor =
-
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
-                        KEY_TITLE, KEY_BODY}, KEY_ROWID + "=" + rowId, null,
+                        KEY_TITLE, KEY_BODY, KEY_AMOUNT, KEY_CREATED}, KEY_ROWID + "=" + rowId, null,
                         null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -151,11 +168,25 @@ public class ExpensesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
-    public boolean updateNote(long rowId, String title, String body) {
+    public boolean updateExpense(long rowId, String title, String body, Double amount, Date created) {
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
+        args.put(KEY_AMOUNT, amount);
+        
+        // set the format to sql date time
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+        args.put(KEY_CREATED, dateFormat.format(created));
 
+        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
+
+    public boolean updateExpense(long rowId, String title, String body, Double amount) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_TITLE, title);
+        args.put(KEY_BODY, body);
+        args.put(KEY_AMOUNT, amount);
+        
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
 }

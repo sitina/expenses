@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="net.sitina.android.expenses"
-      android:versionCode="1"
-      android:versionName="1.0">
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".Expenses"
-                  android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+	package="net.sitina.android.expenses" android:versionCode="1"
+	android:versionName="1.0">
+	<application android:icon="@drawable/icon" android:label="@string/app_name">
+		<activity android:name=".Expenses" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
 
-    <activity android:name=".ExpensesEdit"></activity>
-</application>
-    <uses-sdk android:minSdkVersion="5" />
-
+		<activity android:name=".ExpensesEdit"></activity>
+		<uses-library android:name="android.test.runner" />		
+	</application>
+	<uses-sdk android:minSdkVersion="3" />
+	<instrumentation android:targetPackage="net.sitina.android.expenses" android:name="android.test.InstrumentationTestRunner" />	
 </manifest> 

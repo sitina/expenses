@@ -11,6 +11,7 @@ public class ExpensesEdit extends Activity {
 
 	private EditText mTitleText;
     private EditText mBodyText;
+    private EditText mAmount;
     private Long mRowId;
     private ExpensesDbAdapter mDbHelper;
 
@@ -24,6 +25,7 @@ public class ExpensesEdit extends Activity {
        
         mTitleText = (EditText) findViewById(R.id.title);
         mBodyText = (EditText) findViewById(R.id.body);
+        mAmount = (EditText) findViewById(R.id.amount);
       
         Button confirmButton = (Button) findViewById(R.id.confirm);
        
@@ -49,12 +51,16 @@ public class ExpensesEdit extends Activity {
     
     private void populateFields() {
         if (mRowId != null) {
-            Cursor note = mDbHelper.fetchNote(mRowId);
+            Cursor note = mDbHelper.fetchExpense(mRowId);
             startManagingCursor(note);
-            mTitleText.setText(note.getString(
-    	            note.getColumnIndexOrThrow(ExpensesDbAdapter.KEY_TITLE)));
-            mBodyText.setText(note.getString(
-                    note.getColumnIndexOrThrow(ExpensesDbAdapter.KEY_BODY)));
+            
+            String title = note.getString(note.getColumnIndexOrThrow(ExpensesDbAdapter.KEY_TITLE));
+            String body = note.getString(note.getColumnIndexOrThrow(ExpensesDbAdapter.KEY_BODY));            
+            Double amount = note.getDouble(note.getColumnIndexOrThrow(ExpensesDbAdapter.KEY_AMOUNT));
+            
+            mTitleText.setText(title != null ? title : "");
+            mBodyText.setText(body != null ? body : "");
+            mAmount.setText(amount != null ? amount.toString() : "0.00");
         }
     }
     
@@ -79,14 +85,15 @@ public class ExpensesEdit extends Activity {
     private void saveState() {
         String title = mTitleText.getText().toString();
         String body = mBodyText.getText().toString();
+        Double amount = Double.valueOf(mAmount.getText().toString());
 
         if (mRowId == null) {
-            long id = mDbHelper.createNote(title, body);
+            long id = mDbHelper.createExpense(title, body, amount, null);
             if (id > 0) {
                 mRowId = id;
             }
-        } else {
-            mDbHelper.updateNote(mRowId, title, body);
+        } else {        	
+            mDbHelper.updateExpense(mRowId, title, body, amount);
         }
     }
     

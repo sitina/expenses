@@ -34,7 +34,7 @@ public class Expenses extends ListActivity {
     }
     
     private void fillData() {
-        Cursor notesCursor = mDbHelper.fetchAllNotes();
+        Cursor notesCursor = mDbHelper.fetchAllExpenses();
         startManagingCursor(notesCursor);
         
         // Create an array to specify the fields we want to display in the list (only TITLE)
@@ -79,7 +79,7 @@ public class Expenses extends ListActivity {
 		switch(item.getItemId()) {
     	case DELETE_ID:
     		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	        mDbHelper.deleteNote(info.id);
+	        mDbHelper.deleteExpense(info.id);
 	        fillData();
 	        return true;
 		}
